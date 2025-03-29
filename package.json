@@ -1,0 +1,20 @@
+{
+    "name": "job-portal",
+    "version": "1.0.0",
+    "description": "Simple Express job portal API",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "axios": "^1.8.4",
+        "bcryptjs": "^2.4.3",
+        "body-parser": "^1.20.0",
+        "cors": "^2.8.5",
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.0",
+        "mongoose": "^7.0.0",
+        "uuid": "^11.1.0"
+    }
+}
