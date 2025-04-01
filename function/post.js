@@ -93,8 +93,9 @@ const getPosts = async (id) => {
   const reviews = await Review.find({ userId: { $in: userIds } });
 
   const postsWithReviews = posts.map(post => {
-    const averageReview = reviews.length
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+    const userReviews = reviews.filter(review => review.userId.equals(post.userId))
+    const averageReview = userReviews.length
+      ? userReviews.reduce((sum, review) => sum + review.rating, 0) / userReviews.length
       : 0;
     return {
       ...post,
