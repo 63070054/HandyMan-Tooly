@@ -42,10 +42,10 @@ router.get("/me", async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, "secretkey");
-    const userData = await getUserById(decoded.userId);
+    const userData = await getUserById(decoded.userId, req);
     res.json(userData);
   } catch (error) {
-    res.status(401).json({ error: "Invalid token" });
+    res.status(401).json({ error: error.message });
   }
 });
 
@@ -53,18 +53,16 @@ router.get("/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const userData = await getUserById(id);
+    const userData = await getUserById(id, req);
     res.json(userData);
   } catch (error) {
     res.status(500).json({ error });
   }
 });
 
-const getUserById = async (id) => {
+const getUserById = async (id, request) => {
+  const { provinceId, amphureId, tambonId, query } = request.query;
   const user = await User.findById(id);
-
-  console.log(("user", user))
-
 
   if (!user) {
     return res.status(404).json({ error: "User not found" });
@@ -78,10 +76,7 @@ const getUserById = async (id) => {
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
     : 0;
 
-
   const posts = await Post.find({ userId: user.id }).exec();
-
-  console.log("posts", posts)
 
   const filteredPosts = posts.filter(post => {
     let isValid = true;
