@@ -3,6 +3,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const User = require("../model/user");
 const Review = require("../model/review");
+const Post = require("../model/post");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
@@ -74,6 +75,30 @@ const getUserById = async (id) => {
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
     : 0;
 
+  const posts = await Post.find({ userId: user.id }).exec();
+
+  const filteredPosts = posts.filter(post => {
+    let isValid = true;
+
+    if (provinceId) {
+      isValid = isValid && post.provinceId === parseInt(provinceId);
+    }
+
+    if (amphureId) {
+      isValid = isValid && post.amphureId === parseInt(amphureId);
+    }
+
+    if (tambonId) {
+      isValid = isValid && post.tambonId === parseInt(tambonId);
+    }
+
+    if (query) {
+      isValid = isValid && (post.title.includes(query) || post.services.some(service => service.includes(query)) || post.userId.name.includes(query));
+    }
+
+    return isValid;
+  });
+
   const userData = {
     ...user.toObject(),
     averageReview,
@@ -84,6 +109,7 @@ const getUserById = async (id) => {
       review: review.review,
       rating: review.rating
     })),
+    posts: filteredPosts,
   };
 
   return userData;

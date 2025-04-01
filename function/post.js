@@ -6,7 +6,7 @@ const { ObjectId } = require("mongoose").Types;
 
 router.get("/", async (req, res) => {
   try {
-    const { provinceId, amphureId, tambonId } = req.query;
+    const { provinceId, amphureId, tambonId, query } = req.query;
 
     const posts = await getPosts();
 
@@ -23,6 +23,10 @@ router.get("/", async (req, res) => {
 
       if (tambonId) {
         isValid = isValid && post.tambonId === parseInt(tambonId);
+      }
+
+      if (query) {
+        isValid = isValid && (post.title.includes(query) || post.services.some(service => service.includes(query)) || post.userId.name.includes(query));
       }
 
       return isValid;
