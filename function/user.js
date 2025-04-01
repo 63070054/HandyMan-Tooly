@@ -7,27 +7,6 @@ const Post = require("../model/post");
 const router = express.Router();
 const { ObjectId } = require("mongoose").Types;
 
-router.put("/:id", async (req, res) => {
-  const { name, email, phone } = req.body;
-
-  try {
-    // Find the user by ID and update only the specified fields
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { name, email, phone },
-      { new: true, runValidators: true } // Return updated user & apply schema validation
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.status(200).json({ message: "User updated successfully", user: updatedUser });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
 router.post("/register", async (req, res) => {
   const { name, email, phone, password, confirmPassword } = req.body;
 
@@ -68,6 +47,32 @@ router.get("/me", async (req, res) => {
     res.json(userData);
   } catch (error) {
     res.status(401).json({ error: error.message });
+  }
+});
+
+router.put("/me", async (req, res) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  const { name, email, phone } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, "secretkey");
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.userId,
+      { name, email, phone },
+      { new: true, runValidators: true } // Return updated user & apply schema validation
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 
