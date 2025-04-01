@@ -27,7 +27,7 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user && (await bcrypt.compare(password, user.password))) {
-    const token = jwt.sign({ userId: user.id }, "secretkey", { expiresIn: "1h" });
+    const token = jwt.sign({ userId: user.id }, "secretkey");
     res.json({ token });
   } else {
     res.status(401).json({ error: "Invalid credentials" });
@@ -63,6 +63,9 @@ router.get("/:id", async (req, res) => {
 const getUserById = async (id) => {
   const user = await User.findById(id);
 
+  console.log(("user", user))
+
+
   if (!user) {
     return res.status(404).json({ error: "User not found" });
   }
@@ -75,7 +78,10 @@ const getUserById = async (id) => {
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
     : 0;
 
+
   const posts = await Post.find({ userId: user.id }).exec();
+
+  console.log("posts", posts)
 
   const filteredPosts = posts.filter(post => {
     let isValid = true;
