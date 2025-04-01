@@ -23,6 +23,7 @@ router.post("/", async (req, res) => {
                 "Content-Type": "application/octet-stream", // Required for binary data
                 Authorization: `Basic ${Buffer.from(`api:${apiKey}`).toString("base64")}`, // TinyPNG requires Basic Auth
             },
+            maxBodyLength: Infinity,
         });
 
         const data = response.data;
