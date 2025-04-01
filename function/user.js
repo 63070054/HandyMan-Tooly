@@ -5,6 +5,7 @@ const User = require("../model/user");
 const Review = require("../model/review");
 const Post = require("../model/post");
 const router = express.Router();
+const { ObjectId } = require("mongoose").Types;
 
 router.post("/register", async (req, res) => {
   const { name, email, phone, password, confirmPassword } = req.body;
@@ -76,7 +77,42 @@ const getUserById = async (id, request) => {
     ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
     : 0;
 
-  const posts = await Post.find({ userId: user.id }).exec();
+  const aggregates = [
+    {
+      $match: { userId: new ObjectId(id) }
+    },
+    {
+      $lookup: {
+        from: "provinces",
+        localField: "provinceId",
+        foreignField: "provinceId",
+        as: "province"
+      }
+    },
+    { $unwind: { path: "$province", preserveNullAndEmptyArrays: true } },
+
+    {
+      $lookup: {
+        from: "amphures",
+        localField: "amphureId",
+        foreignField: "amphureId",
+        as: "amphure"
+      }
+    },
+    { $unwind: { path: "$amphure", preserveNullAndEmptyArrays: true } },
+
+    {
+      $lookup: {
+        from: "tambons",
+        localField: "tambonId",
+        foreignField: "tambonId",
+        as: "tambon"
+      }
+    },
+    { $unwind: { path: "$tambon", preserveNullAndEmptyArrays: true } },
+  ]
+
+  const posts = await Post.aggregate(aggregates);
 
   const filteredPosts = posts.filter(post => {
     let isValid = true;
