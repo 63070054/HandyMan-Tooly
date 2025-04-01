@@ -7,6 +7,27 @@ const Post = require("../model/post");
 const router = express.Router();
 const { ObjectId } = require("mongoose").Types;
 
+router.put("/:id", async (req, res) => {
+  const { name, email, phone } = req.body;
+
+  try {
+    // Find the user by ID and update only the specified fields
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { name, email, phone },
+      { new: true, runValidators: true } // Return updated user & apply schema validation
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
 router.post("/register", async (req, res) => {
   const { name, email, phone, password, confirmPassword } = req.body;
 
