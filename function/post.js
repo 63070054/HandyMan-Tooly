@@ -106,7 +106,16 @@ const getPosts = async (id) => {
 }
 
 router.post("/", async (req, res) => {
-  const newPost = new Post(req.body);
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
+  }
+
+  const decoded = jwt.verify(token, "secretkey");
+  const newPost = new Post({
+    ...req.body,
+    userId: new ObjectId(decoded.userId),
+  });
   await newPost.save();
   res.json({ message: "Job posted successfully" });
 });
