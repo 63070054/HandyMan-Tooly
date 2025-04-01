@@ -7,6 +7,7 @@ const userRoutes = require("../function/user");
 const postRoutes = require("../function/post");
 const reviewRoutes = require("../function/review");
 const locationRouters = require("../function/location");
+const imgeRouters = require("../function/image");
 
 dotenv.config();
 const app = express();
@@ -27,6 +28,7 @@ app.use("/users", userRoutes);
 app.use("/posts", postRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/locations", locationRouters);
+app.use("/upload-images", imgeRouters);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
